@@ -29,7 +29,9 @@ Current progress:
 
 - Stage 0 baseline is in place: public tests, normalized-output tests, and a
   benchmark command exist.
-- Stage 1 has started with internal tokenizer/span utilities and focused tests.
+- Stage 1 is complete with internal tokenizer/span utilities and focused tests.
+- Stage 2 is complete with internal candidate extractor scaffolding, rule IDs,
+  priorities, and focused tests for high-confidence metadata fields.
 
 ## Source Context
 
@@ -1175,6 +1177,13 @@ Done when:
 
 - major current fields can be produced as candidates
 - candidate tests cover overlaps and ambiguous values
+
+Status:
+
+- Complete. The internal `candidate-extractors` module defines candidate and
+  parse context creation, includes rule IDs and priorities, and extracts
+  high-confidence structural and technical metadata while preserving current
+  public parser behavior.
 
 ### Stage 3: Add Conflict Resolver
 
