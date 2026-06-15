@@ -158,6 +158,24 @@ var seasonEpisodeRule = {
       );
     }.bind(this));
 
+    forEachMatch(
+      ctx.input,
+      /\b(?:Saison|Season)[. _-]?([0-9]{1,2})[. _-]?(?:Ep(?:isode)?|E)[. _-]?([0-9]{1,5})\b/i,
+      function (match) {
+        candidates.push(
+          createCandidate(this, match[0], parseInt(match[1], 10), match.index, match.index + match[0].length, {
+            field: "season",
+          }),
+        );
+
+        candidates.push(
+          createCandidate(this, match[0], parseInt(match[2], 10), match.index, match.index + match[0].length, {
+            field: "episode",
+          }),
+        );
+      }.bind(this),
+    );
+
     return candidates;
   },
 };
@@ -200,15 +218,18 @@ var rules = [
       return /fhd/i.test(match[1]) ? "1080p" : "4k";
     },
   }),
-  valueMapRule("source.standard", "source", PRIORITY.TECHNICAL, /\b(?:WEB-?DL|WEB-?Rip|HDTV|Blu-?Ray|BRRip|BDRip|DVD(?:Rip|scr)?|REMUX|HD-?CAM|TS|Telesync)\b/i, {
+  valueMapRule("source.standard", "source", PRIORITY.TECHNICAL, /\b(?:WEB-?DL|WEB-?Rip|HDTV|PDTV|Blu-?Ray|BRRip|BDRip|HD-?Rip|DVD(?:Rip|scr)?|REMUX|HD-?CAM|CamRip|TS|Telesync)\b/i, {
     bluray: "bluray",
     brrip: "bluray",
     bdrip: "bluray",
+    camrip: "cam",
     dvdrip: "dvd",
     dvdscr: "dvd",
     dvd: "dvd",
     hdcam: "cam",
+    hdrip: "hdrip",
     hdtv: "hdtv",
+    pdtv: "hdtv",
     remux: "remux",
     telesync: "telesync",
     ts: "telesync",
@@ -276,6 +297,16 @@ var rules = [
     "hdr10+": "HDR10+",
     sdr: "SDR",
   }),
+  regexpRule("bitdepth.standard", "bitdepth", PRIORITY.TECHNICAL, /\b(8|10|12|16|24)[-\s.]?bits?\b/i, {
+    value: function (match) {
+      return parseInt(match[1], 10);
+    },
+  }),
+  regexpRule("samplerate.standard", "samplerate", PRIORITY.TECHNICAL, /\b((?:\d+)(?:\.\d+)?)[-\s.]?kHz?\b/i, {
+    value: function (match) {
+      return parseFloat(match[1]);
+    },
+  }),
   valueMapRule("service.standard", "service", PRIORITY.TECHNICAL, /\b(?:AMZN|Amazon|ATVP|AppleTV|DSNP|Disney\+?|HMAX|HBO[. ]Max|HULU|NF|NFLX|Netflix|PCOK|Peacock)\b/i, {
     amazon: "AMZN",
     amzn: "AMZN",
@@ -294,8 +325,34 @@ var rules = [
     pcok: "PCOK",
     peacock: "PCOK",
   }),
-  valueMapRule("flag.release", "flags", PRIORITY.DESCRIPTIVE, /\b(?:EXTENDED|THEATRICAL|UNCUT|UNRATED|UNCENSORED|OPEN[. ]MATTE|HYBRID|REMUX|HARDCODED|PROPER|REPACK|RERIP|INTERNAL|REMASTERED?)\b/i, {
+  valueMapRule("language.standard", "language", PRIORITY.DESCRIPTIVE, /\b(?:rus\.eng|MULTi(?:Lang|-audio|-VF2)?|Dual(?:[- ]Audio)?|ENGLISH|ENG|FR(?:ENCH)?|TRUEFRENCH|VFF|VFI|ITA(?:LIAN)?|GERMAN|RUS|UKR|JPN|NORDIC|DUBBED)\b/i, {
+    dual: "dual",
+    dualaudio: "dual",
+    dubbed: "dubbed",
+    eng: "eng",
+    english: "eng",
+    fr: "fr",
+    french: "fr",
+    german: "german",
+    ita: "ita",
+    italian: "ita",
+    jpn: "jpn",
+    multi: "multi",
+    multiaudio: "multi",
+    multilang: "multi",
+    multivf2: "multi",
+    nordic: "nordic",
+    rus: "rus",
+    ruseng: "rus.eng",
+    "rus.eng": "rus.eng",
+    truefrench: "fr",
+    ukr: "ukr",
+    vff: "fr",
+    vfi: "fr",
+  }),
+  valueMapRule("flag.release", "flags", PRIORITY.DESCRIPTIVE, /\b(?:EXTENDED|THEATRICAL|UNCUT|UNRATED|UNCENSORED|OPEN[. ]MATTE|HYBRID|REMUX|HC|HARDCODED|REAL[. ]PROPER|PROPER|REPACK|RERIP|INTERNAL|RETAIL|REMASTERED?|WS)\b/i, {
     extended: "extended",
+    hc: "hardcoded",
     hardcoded: "hardcoded",
     hybrid: "hybrid",
     internal: "internal",
@@ -306,10 +363,26 @@ var rules = [
     remux: "remux",
     repack: "repack",
     rerip: "repack",
+    retail: "retail",
+    realproper: "proper",
     theatrical: "theatrical",
     uncut: "uncut",
     uncensored: "unrated",
     unrated: "unrated",
+    ws: "widescreen",
+  }),
+  valueMapRule("container.standard", "container", PRIORITY.DESCRIPTIVE, /\b(?:MKV|AVI|MP4)\b/i, {
+    avi: "AVI",
+    mkv: "MKV",
+    mp4: "MP4",
+  }),
+  regexpRule("region.standard", "region", PRIORITY.DESCRIPTIVE, /(?:^|[\W_])(R[0-9])(?:$|[\W_])/, {
+    rawIndex: 1,
+    valueIndex: 1,
+  }),
+  regexpRule("encoder.before-final-group", "encoder", PRIORITY.DESCRIPTIVE, /-([A-Za-z0-9][A-Za-z0-9[\]{}=+ ]*)-([A-Za-z0-9][A-Za-z0-9[\]{}=+ ]*)$/, {
+    rawIndex: 1,
+    valueIndex: 1,
   }),
   regexpRule("group.final-hyphen", "group", PRIORITY.STRUCTURAL, /-\s*([A-Za-z0-9][A-Za-z0-9[\]{}=+ ]*)$/, {
     rawIndex: 0,

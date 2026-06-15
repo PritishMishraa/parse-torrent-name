@@ -32,6 +32,10 @@ Current progress:
 - Stage 1 is complete with internal tokenizer/span utilities and focused tests.
 - Stage 2 is complete with internal candidate extractor scaffolding, rule IDs,
   priorities, and focused tests for high-confidence metadata fields.
+- Stage 3 is complete with candidate-producing rules for high-confidence
+  structural, technical, descriptive, language, container, group, encoder, and
+  prefix fields while preserving the legacy parser as the public projection
+  path.
 
 ## Source Context
 

@@ -86,6 +86,19 @@ test("extracts 1x02 season and episode candidates from the same span", function 
   assert.equal(season.end, episode.end);
 });
 
+test("extracts season and episode candidates from phrase markers", function () {
+  var candidates = extractors.extractCandidates(
+    "Some.Show.Season.2.Episode.10.1080p.NFLX.WEBRip.AV1.Opus.2.0-GRP",
+  );
+  var season = findCandidate(candidates, "season", "Season.2.Episode.10");
+  var episode = findCandidate(candidates, "episode", "Season.2.Episode.10");
+
+  assert.equal(season.value, 2);
+  assert.equal(episode.value, 10);
+  assert.equal(season.source, "episode.sxxexx");
+  assert.equal(episode.source, "episode.sxxexx");
+});
+
 test("does not extract a release year from S2024E01 style episode markers", function () {
   var candidates = extractors.extractCandidates("Future.Show.S2024E01.1080p.WEB-DL");
 
@@ -101,6 +114,43 @@ test("keeps specific technical candidates intact", function () {
   assert.equal(findCandidate(candidates, "colors", "HDR10+").value, "HDR10+");
   assert.equal(findCandidate(candidates, "source", "BluRay").value, "bluray");
   assert.equal(findCandidate(candidates, "codec", "x265").value, "HEVC");
+});
+
+test("extracts language, container, region, and release flag candidates", function () {
+  var candidates = extractors.extractCandidates(
+    "Movie.2024.R6.ENG.MULTi.HC.REAL.PROPER.RETAIL.WS.1080p.WEB-DL.MKV-GRP",
+  );
+
+  assert.equal(findCandidate(candidates, "region", "R6").value, "R6");
+  assert.equal(findCandidate(candidates, "language", "ENG").value, "eng");
+  assert.equal(findCandidate(candidates, "language", "MULTi").value, "multi");
+  assert.equal(findCandidate(candidates, "flags", "HC").value, "hardcoded");
+  assert.equal(findCandidate(candidates, "flags", "REAL.PROPER").value, "proper");
+  assert.equal(findCandidate(candidates, "flags", "RETAIL").value, "retail");
+  assert.equal(findCandidate(candidates, "flags", "WS").value, "widescreen");
+  assert.equal(findCandidate(candidates, "container", "MKV").value, "MKV");
+});
+
+test("extracts audio detail candidates", function () {
+  var candidates = extractors.extractCandidates(
+    "Film.2022.1080p.HMAX.WEB-DL.FLAC.24bit.48kHz.x265-Group",
+  );
+
+  assert.equal(findCandidate(candidates, "bitdepth", "24bit").value, 24);
+  assert.equal(findCandidate(candidates, "samplerate", "48kHz").value, 48);
+  assert.equal(findCandidate(candidates, "audio", "FLAC").value, "FLAC");
+});
+
+test("extracts conservative encoder candidates before a final group", function () {
+  var candidates = extractors.extractCandidates(
+    "Movie.2024.1080p.BluRay.x264-SomeEncoder-GRP",
+  );
+  var encoder = findCandidate(candidates, "encoder", "SomeEncoder");
+  var group = findCandidate(candidates, "group", "-GRP");
+
+  assert.equal(encoder.value, "SomeEncoder");
+  assert.equal(encoder.source, "encoder.before-final-group");
+  assert.equal(group.value, "GRP");
 });
 
 test("candidate extractors are internal and do not change public parser output", function () {
