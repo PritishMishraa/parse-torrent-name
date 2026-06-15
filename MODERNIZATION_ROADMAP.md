@@ -61,6 +61,10 @@ Current progress:
 - Parser instance API has started: `parseTorrentName.Parser` supports
   `addRule(rule)`, `use(rulePack)`, custom additive candidate rules, debug
   output for custom candidates, tests, docs, and TypeScript declarations.
+- Optional utility entry points have started: `parse-torrent-name/normalize`
+  exports `normalizeTitle()` and `parse-torrent-name/similarity` exports
+  `titleSimilarity()` with tests, docs, type declarations, and package
+  validation.
 
 ## Source Context
 

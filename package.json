@@ -10,6 +10,16 @@
       "types": "./index.d.ts",
       "require": "./index.js",
       "default": "./index.js"
+    },
+    "./normalize": {
+      "types": "./normalize.d.ts",
+      "require": "./normalize.js",
+      "default": "./normalize.js"
+    },
+    "./similarity": {
+      "types": "./similarity.d.ts",
+      "require": "./similarity.js",
+      "default": "./similarity.js"
     }
   },
   "files": [
@@ -18,9 +28,13 @@
     "index.d.ts",
     "inference.js",
     "index.js",
+    "normalize.d.ts",
+    "normalize.js",
     "parser.js",
     "readme.md",
     "resolver.js",
+    "similarity.d.ts",
+    "similarity.js",
     "tokenizer.js"
   ],
   "repository": {

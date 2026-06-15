@@ -130,6 +130,19 @@ parser.parse("Movie.Part.2.2024.1080p.WEB-DL-GRP");
 Custom rules are additive: they can add fields that the default parser does not
 already return. The default `ptn(name)` API remains preconfigured and unchanged.
 
+Optional utilities are available from separate entry points:
+
+```js
+const normalizeTitle = require("parse-torrent-name/normalize");
+const titleSimilarity = require("parse-torrent-name/similarity");
+
+normalizeTitle("Amelie & Co."); // "amelie and co"
+titleSimilarity("Spider-Man", "Spider Man"); // 1
+```
+
+These helpers are intentionally separate from `ptn(name)` so parsing stays
+deterministic and policy-free.
+
 ## Parsed Fields
 
 Common fields include `title`, `year`, `season`, `episode`, `episodeName`,
