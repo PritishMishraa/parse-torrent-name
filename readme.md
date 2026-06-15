@@ -96,6 +96,40 @@ ptn("Movie.2024.1080p.WEB-DL.DDP5.1-GRP", {
 Debug details are intended for parser inspection and may be less stable than
 the top-level parsed fields.
 
+Custom parser instances can add project-specific rules without forking:
+
+```js
+const parser = new ptn.Parser();
+
+parser.addRule({
+  id: "custom.part",
+  field: "part",
+  priority: 70,
+  match(ctx) {
+    const match = ctx.input.match(/(?:^|[. _-])Part[. _-]?([0-9]+)/i);
+
+    if (!match) return [];
+
+    return [{
+      field: "part",
+      raw: match[0],
+      value: Number(match[1]),
+      start: match.index,
+      end: match.index + match[0].length,
+      priority: 70,
+      confidence: 1,
+      source: "custom.part",
+      consumes: true
+    }];
+  }
+});
+
+parser.parse("Movie.Part.2.2024.1080p.WEB-DL-GRP");
+```
+
+Custom rules are additive: they can add fields that the default parser does not
+already return. The default `ptn(name)` API remains preconfigured and unchanged.
+
 ## Parsed Fields
 
 Common fields include `title`, `year`, `season`, `episode`, `episodeName`,

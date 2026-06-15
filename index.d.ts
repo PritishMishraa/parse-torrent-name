@@ -5,6 +5,22 @@ declare namespace parseTorrentName {
     includeDebug?: boolean;
   }
 
+  export interface ParseContext {
+    input: string;
+    tokens: Token[];
+    options: ParseOptions;
+  }
+
+  export interface Token {
+    raw: string;
+    normalized: string;
+    start: number;
+    end: number;
+    separatorBefore?: string;
+    separatorAfter?: string;
+    bracket?: "round" | "square" | "curly";
+  }
+
   export interface NormalizedTorrentName {
     title?: string;
     type?: "movie" | "show";
@@ -34,6 +50,17 @@ declare namespace parseTorrentName {
     source: string;
     consumes: boolean;
     index?: number;
+  }
+
+  export interface Rule {
+    id: string;
+    field: string;
+    priority: number;
+    match(ctx: ParseContext): Candidate[];
+  }
+
+  export interface RulePack {
+    rules: Rule[];
   }
 
   export interface RejectedCandidate {
@@ -124,6 +151,14 @@ declare namespace parseTorrentName {
     excess?: string | string[];
     normalized?: NormalizedTorrentName;
     debug?: DebugInfo;
+    [field: string]: unknown;
+  }
+
+  export class Parser {
+    constructor();
+    addRule(rule: Rule): this;
+    use(rulePack: Rule[] | RulePack): this;
+    parse(name: string, options?: ParseOptions): ParsedTorrentName;
   }
 }
 

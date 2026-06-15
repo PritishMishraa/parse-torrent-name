@@ -18,6 +18,7 @@
     "index.d.ts",
     "inference.js",
     "index.js",
+    "parser.js",
     "readme.md",
     "resolver.js",
     "tokenizer.js"

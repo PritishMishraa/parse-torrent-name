@@ -58,6 +58,9 @@ Current progress:
 - Type declarations and package validation are in place for the current CJS
   package shape: `index.d.ts`, type-aware `exports`, explicit CommonJS package
   metadata, `npm run lint:package`, and `prepublishOnly` publish checks.
+- Parser instance API has started: `parseTorrentName.Parser` supports
+  `addRule(rule)`, `use(rulePack)`, custom additive candidate rules, debug
+  output for custom candidates, tests, docs, and TypeScript declarations.
 
 ## Source Context
 
