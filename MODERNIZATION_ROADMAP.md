@@ -55,6 +55,9 @@ Current progress:
 - Stage 10/`includeDebug` has started: `parseTorrentName(name, {
   includeDebug: true })` now includes candidate extraction, accepted/rejected
   resolution output, consumed spans, unconsumed spans, and a resolution trace.
+- Type declarations and package validation are in place for the current CJS
+  package shape: `index.d.ts`, type-aware `exports`, explicit CommonJS package
+  metadata, `npm run lint:package`, and `prepublishOnly` publish checks.
 
 ## Source Context
 

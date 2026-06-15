@@ -2,13 +2,20 @@
   "name": "parse-torrent-name",
   "version": "0.5.4",
   "description": "Parses torrent name of a movie or TV show.",
+  "type": "commonjs",
   "main": "./index.js",
+  "types": "./index.d.ts",
   "exports": {
-    ".": "./index.js"
+    ".": {
+      "types": "./index.d.ts",
+      "require": "./index.js",
+      "default": "./index.js"
+    }
   },
   "files": [
     "candidate-extractors.js",
     "core.js",
+    "index.d.ts",
     "inference.js",
     "index.js",
     "readme.md",
@@ -32,6 +39,8 @@
   },
   "scripts": {
     "benchmark": "node benchmark/parse.js",
+    "lint:package": "npx --yes publint && npx --yes @arethetypeswrong/cli --pack .",
+    "prepublishOnly": "npm test && npm run lint:package",
     "test": "node --test"
   }
 }

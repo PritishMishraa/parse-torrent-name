@@ -66,17 +66,49 @@ ptn("Movie.2024.2160p.AMZN.WEB-DL.DDP5.1.Atmos.DV.HDR10.HEVC-NTb", {
 Top-level fields preserve parsed release text where possible. The `normalized`
 object is intended for filtering, ranking, search, and deduplication.
 
+Debug output is also opt-in:
+
+```js
+ptn("Movie.2024.1080p.WEB-DL.DDP5.1-GRP", {
+  includeDebug: true,
+});
+/*
+{
+  title: "Movie",
+  year: 2024,
+  resolution: "1080p",
+  quality: "WEB-DL",
+  audio: "DDP",
+  group: "GRP",
+  debug: {
+    candidates: [ ... ],
+    accepted: [ ... ],
+    rejected: [ ... ],
+    consumedSpans: [ ... ],
+    resolvedConsumedSpans: [ ... ],
+    resolvedUnconsumedSpans: [ ... ],
+    trace: [ ... ]
+  }
+}
+*/
+```
+
+Debug details are intended for parser inspection and may be less stable than
+the top-level parsed fields.
+
 ## Parsed Fields
 
 Common fields include `title`, `year`, `season`, `episode`, `episodeName`,
 `resolution`, `quality`, `source`, `service`, `codec`, `audio`, `channels`,
-`color`, `colors`, `language`, `container`, `group`, `website`, `excess`, and
-release flags such as `proper`, `repack`, `remux`, `hybrid`, `hardcoded`,
-`extended`, `uncut`, `unrated`, `retail`, `remastered`, and `widescreen`.
+`color`, `colors`, `language`, `container`, `group`, `encoder`, `website`,
+`excess`, and release flags such as `proper`, `repack`, `remux`, `hybrid`,
+`hardcoded`, `extended`, `uncut`, `unrated`, `retail`, `remastered`, and
+`widescreen`.
 
 ## Development
 
 ```bash
 npm test
 npm run benchmark
+npm run lint:package
 ```
