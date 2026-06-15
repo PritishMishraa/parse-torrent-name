@@ -712,7 +712,7 @@ Recommended modern stack:
 - Node 24 LTS as a modern baseline, or Node 22 as a wider compatibility floor
 - `node:test` plus `node:assert/strict` for a small dependency-light package
 - Vitest only if richer test DX is worth the dependency
-- `tsup`, `rolldown`, or `unbuild` only if dual ESM/CJS output is needed
+- `tsdown` only if dual ESM/CJS output is needed
 - ESLint plus Prettier, or Biome as a single lint/format tool
 - fixture-based tests in JSON/YAML or categorized JS fixtures
 - property/fuzz tests with something like `fast-check`
