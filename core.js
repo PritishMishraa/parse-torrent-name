@@ -750,6 +750,50 @@ var normalizeParts = function (parts) {
   return normalized;
 };
 
+var buildDebugTrace = function (resolved) {
+  var trace = [];
+
+  resolved.accepted.forEach(function (candidate) {
+    trace.push({
+      action: "accepted",
+      field: candidate.field,
+      raw: candidate.raw,
+      source: candidate.source,
+      start: candidate.start,
+      end: candidate.end,
+    });
+  });
+
+  resolved.rejected.forEach(function (rejection) {
+    trace.push({
+      action: "rejected",
+      field: rejection.candidate.field,
+      raw: rejection.candidate.raw,
+      source: rejection.candidate.source,
+      start: rejection.candidate.start,
+      end: rejection.candidate.end,
+      reason: rejection.reason,
+      rejectedBy: {
+        field: rejection.rejectedBy.field,
+        raw: rejection.rejectedBy.raw,
+        source: rejection.rejectedBy.source,
+      },
+    });
+  });
+
+  return trace.sort(function (left, right) {
+    if (left.start !== right.start) {
+      return left.start - right.start;
+    }
+
+    if (left.end !== right.end) {
+      return left.end - right.end;
+    }
+
+    return left.action < right.action ? -1 : left.action > right.action ? 1 : 0;
+  });
+};
+
 module.exports.exec = function (name, options) {
   var parts = {};
   var start = 0;
@@ -760,6 +804,8 @@ module.exports.exec = function (name, options) {
   var resolvedCandidates;
   var resolvedEpisodeNameCandidates;
   var resolvedGroupCandidates;
+  var debugCandidates;
+  var debugResolvedCandidates;
   var inferredTitle;
   var inferredEpisodeName;
   var inferredGroupAndEncoder;
@@ -982,6 +1028,21 @@ module.exports.exec = function (name, options) {
 
   if (options.normalize) {
     parts.normalized = normalizeParts(parts);
+  }
+
+  if (options.includeDebug) {
+    debugCandidates = candidateExtractors.extractCandidates(name, options);
+    debugResolvedCandidates = resolver.resolveCandidates(name, debugCandidates);
+
+    parts.debug = {
+      candidates: debugCandidates,
+      accepted: debugResolvedCandidates.accepted,
+      rejected: debugResolvedCandidates.rejected,
+      consumedSpans: consumedSpans.slice(),
+      resolvedConsumedSpans: debugResolvedCandidates.consumedSpans,
+      resolvedUnconsumedSpans: debugResolvedCandidates.unconsumedSpans,
+      trace: buildDebugTrace(debugResolvedCandidates),
+    };
   }
 
   return parts;

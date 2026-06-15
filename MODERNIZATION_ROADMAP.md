@@ -52,6 +52,9 @@ Current progress:
 - Stage 9 has started: public excess inference is now based on consumed spans
   from accepted public parts instead of destructive string replacement, while
   preserving legacy group/episode-name fallback cleanup.
+- Stage 10/`includeDebug` has started: `parseTorrentName(name, {
+  includeDebug: true })` now includes candidate extraction, accepted/rejected
+  resolution output, consumed spans, unconsumed spans, and a resolution trace.
 
 ## Source Context
 

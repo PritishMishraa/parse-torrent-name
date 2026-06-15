@@ -507,6 +507,40 @@ test("normalized output is opt-in", function () {
   assert.equal(parts.normalized, undefined);
 });
 
+test("debug output is opt-in", function () {
+  var parts = ptn("Movie.2024.1080p.WEB-DL.x264-GRP");
+
+  assert.equal(parts.debug, undefined);
+});
+
+test("includes candidate resolution debug output when requested", function () {
+  var parts = ptn("Movie.2024.1080p.WEB-DL.DDP5.1-GRP", {
+    includeDebug: true,
+  });
+  var acceptedAudio = parts.debug.accepted.find(function (candidate) {
+    return candidate.field === "audio" && candidate.raw === "DDP5.1";
+  });
+  var rejectedChannels = parts.debug.rejected.find(function (rejection) {
+    return rejection.candidate.field === "channels";
+  });
+
+  assert.ok(Array.isArray(parts.debug.candidates));
+  assert.ok(Array.isArray(parts.debug.accepted));
+  assert.ok(Array.isArray(parts.debug.rejected));
+  assert.ok(Array.isArray(parts.debug.consumedSpans));
+  assert.ok(Array.isArray(parts.debug.resolvedConsumedSpans));
+  assert.ok(Array.isArray(parts.debug.resolvedUnconsumedSpans));
+  assert.ok(Array.isArray(parts.debug.trace));
+  assert.equal(acceptedAudio.value, "DDP");
+  assert.equal(rejectedChannels.reason, "overlap");
+  assert.equal(rejectedChannels.rejectedBy.raw, "DDP5.1");
+  assert.ok(
+    parts.debug.trace.some(function (entry) {
+      return entry.action === "rejected" && entry.field === "channels";
+    }),
+  );
+});
+
 test("normalizes modern web release metadata", function () {
   var parts = ptn(
     "Example.Movie.2024.2160p.AMZN.WEB-DL.DDP5.1.Atmos.DV.HDR10.HEVC-NTb",
