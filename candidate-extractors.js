@@ -403,8 +403,36 @@ var TITLE_RULE_IDS = {
   "year.bounded": true,
 };
 
+var EPISODE_NAME_RULE_IDS = {
+  "atmos.standard": true,
+  "audio.standard": true,
+  "bitdepth.standard": true,
+  "channels.embedded-audio": true,
+  "channels.standard": true,
+  "codec.standard": true,
+  "color.standard": true,
+  "container.standard": true,
+  "encoder.before-final-group": true,
+  "episode.sxxexx": true,
+  "flag.release": true,
+  "garbage.legacy": true,
+  "group.final-hyphen": true,
+  "language.standard": true,
+  "region.standard": true,
+  "resolution.alias": true,
+  "resolution.standard": true,
+  "samplerate.standard": true,
+  "service.standard": true,
+  "source.standard": true,
+  "year.bounded": true,
+};
+
 var titleRules = rules.filter(function (rule) {
   return TITLE_RULE_IDS[rule.id];
+});
+
+var episodeNameRules = rules.filter(function (rule) {
+  return EPISODE_NAME_RULE_IDS[rule.id];
 });
 
 var collectCandidates = function (input, options, ruleList, includeTokens) {
@@ -426,10 +454,15 @@ var extractTitleCandidates = function (input, options) {
   return collectCandidates(input, options, titleRules, false);
 };
 
+var extractEpisodeNameCandidates = function (input, options) {
+  return collectCandidates(input, options, episodeNameRules, false);
+};
+
 module.exports = {
   PRIORITY: PRIORITY,
   createContext: createContext,
   createCandidate: createCandidate,
+  extractEpisodeNameCandidates: extractEpisodeNameCandidates,
   extractCandidates: extractCandidates,
   extractTitleCandidates: extractTitleCandidates,
   rules: rules,

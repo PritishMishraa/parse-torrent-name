@@ -42,6 +42,10 @@ Current progress:
 - Stage 6 has started: public title inference now uses accepted candidate spans
   from a focused title-boundary extractor, with legacy-compatible cleanup,
   fallback behavior, and focused inference tests.
+- Stage 7 has started: public episode name inference now uses accepted
+  candidate spans from a focused episode-name boundary extractor, with
+  release-metadata boundary handling and focused negative tests for language
+  metadata.
 
 ## Source Context
 

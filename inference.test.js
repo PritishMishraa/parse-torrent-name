@@ -15,6 +15,15 @@ var inferTitle = function (input) {
   return inference.inferTitle(input, resolved.accepted);
 };
 
+var inferEpisodeName = function (input) {
+  var resolved = resolver.resolveCandidates(
+    input,
+    extractors.extractEpisodeNameCandidates(input),
+  );
+
+  return inference.inferEpisodeName(input, resolved.accepted);
+};
+
 test("infers title from leading unconsumed spans before release metadata", function () {
   assert.deepEqual(
     inferTitle("Movie.Name.2024.2160p.WEB-DL.DDP5.1.HEVC-GRP"),
@@ -59,5 +68,38 @@ test("keeps parenthesized leftovers available for excess inference", function ()
       start: 0,
       end: 53,
     },
+  );
+});
+
+test("infers episode name between episode marker and release metadata", function () {
+  assert.deepEqual(
+    inferEpisodeName("Gotham.S01E07.Penguins.Umbrella.WEB-DL.x264.AAC"),
+    {
+      name: "episodeName",
+      raw: ".Penguins.Umbrella.",
+      clean: "Penguins Umbrella",
+      start: 13,
+      end: 32,
+    },
+  );
+});
+
+test("infers episode name after dashed episode markers without release metadata", function () {
+  assert.deepEqual(
+    inferEpisodeName("Game of Thrones - 4x03 - Breaker of Chains"),
+    {
+      name: "episodeName",
+      raw: " - Breaker of Chains",
+      clean: "Breaker of Chains",
+      start: 22,
+      end: 42,
+    },
+  );
+});
+
+test("does not infer language metadata as an episode name", function () {
+  assert.equal(
+    inferEpisodeName("Community.s02e20.rus.eng.720p.Kybik.v.Kybe"),
+    undefined,
   );
 });

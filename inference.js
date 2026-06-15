@@ -25,6 +25,27 @@ var TITLE_PREFIX_FIELDS = {
   website: true,
 };
 
+var EPISODE_NAME_BOUNDARY_FIELDS = {
+  atmos: true,
+  audio: true,
+  bitdepth: true,
+  channels: true,
+  codec: true,
+  colors: true,
+  container: true,
+  encoder: true,
+  flags: true,
+  garbage: true,
+  group: true,
+  language: true,
+  region: true,
+  resolution: true,
+  samplerate: true,
+  service: true,
+  source: true,
+  year: true,
+};
+
 var trimLeadingSeparators = function (input, start) {
   var cursor = start;
 
@@ -82,6 +103,14 @@ var cleanTitle = function (raw) {
   return clean.trim();
 };
 
+var cleanPhrase = function (raw) {
+  return String(raw || "")
+    .replace(/^[\s._-]+/, "")
+    .replace(/[\s._-]+$/, "")
+    .replace(/[\._]/g, " ")
+    .trim();
+};
+
 var inferTitle = function (input, candidates) {
   var source = String(input || "");
   var accepted = candidates || [];
@@ -110,7 +139,73 @@ var inferTitle = function (input, candidates) {
   };
 };
 
+var getEpisodeCandidate = function (candidates) {
+  return (candidates || []).find(function (candidate) {
+    return candidate.field === "episode";
+  });
+};
+
+var findEpisodeNameEnd = function (start, input, candidates) {
+  var end;
+
+  (candidates || []).forEach(function (candidate) {
+    if (candidate.field === "group" && /\s/.test(String(candidate.value || ""))) {
+      return;
+    }
+
+    if (
+      !EPISODE_NAME_BOUNDARY_FIELDS[candidate.field] ||
+      candidate.start < start
+    ) {
+      return;
+    }
+
+    if (end === undefined || candidate.start < end) {
+      end = candidate.start;
+    }
+  });
+
+  return end === undefined ? String(input || "").length : end;
+};
+
+var inferEpisodeName = function (input, candidates) {
+  var source = String(input || "");
+  var episode = getEpisodeCandidate(candidates);
+  var start;
+  var end;
+  var raw;
+  var clean;
+
+  if (!episode) {
+    return undefined;
+  }
+
+  start = episode.end;
+  end = findEpisodeNameEnd(start, source, candidates);
+
+  if (end <= start) {
+    return undefined;
+  }
+
+  raw = source.slice(start, end);
+  clean = cleanPhrase(raw);
+
+  if (!clean) {
+    return undefined;
+  }
+
+  return {
+    name: "episodeName",
+    raw: raw,
+    clean: clean,
+    start: start,
+    end: end,
+  };
+};
+
 module.exports = {
+  inferEpisodeName: inferEpisodeName,
   inferTitle: inferTitle,
+  cleanPhrase: cleanPhrase,
   cleanTitle: cleanTitle,
 };

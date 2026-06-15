@@ -758,13 +758,26 @@ module.exports.exec = function (name, options) {
   var groupRaw = "";
   var map;
   var resolvedCandidates;
+  var resolvedEpisodeNameCandidates;
   var inferredTitle;
+  var inferredEpisodeName;
   options = options || {};
 
   resolvedCandidates = resolver.resolveCandidates(
     name,
     candidateExtractors.extractTitleCandidates(name, options),
   );
+
+  if (
+    resolvedCandidates.accepted.some(function (candidate) {
+      return candidate.field === "episode";
+    })
+  ) {
+    resolvedEpisodeNameCandidates = resolver.resolveCandidates(
+      name,
+      candidateExtractors.extractEpisodeNameCandidates(name, options),
+    );
+  }
 
   var addPart = function (part) {
     if (part.appendTo) {
@@ -861,6 +874,17 @@ module.exports.exec = function (name, options) {
 
   inferredTitle = inference.inferTitle(name, resolvedCandidates.accepted);
   addPart(inferredTitle || getTitle(name, start, end));
+
+  if (resolvedEpisodeNameCandidates) {
+    inferredEpisodeName = inference.inferEpisodeName(
+      name,
+      resolvedEpisodeNameCandidates.accepted,
+    );
+
+    if (inferredEpisodeName) {
+      addPart(inferredEpisodeName);
+    }
+  }
 
   (function addExcess() {
     var clean = excessRaw.replace(/(^[-\. ]+)|([-\. ]+$)/g, "");

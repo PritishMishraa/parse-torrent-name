@@ -156,6 +156,17 @@ test("extracts a focused title-boundary candidate subset", function () {
   assert.equal(findCandidate(candidates, "codec", "x264"), undefined);
 });
 
+test("extracts a focused episode-name boundary candidate subset", function () {
+  var candidates = extractors.extractEpisodeNameCandidates(
+    "Community.s02e20.rus.eng.720p.Kybik.v.Kybe",
+  );
+
+  assert.equal(findCandidate(candidates, "episode", "s02e20").value, 20);
+  assert.equal(findCandidate(candidates, "language", "rus.eng").value, "rus.eng");
+  assert.equal(findCandidate(candidates, "resolution", "720p").value, "720p");
+  assert.equal(findCandidate(candidates, "group", "Kybik.v.Kybe"), undefined);
+});
+
 test("extracts audio detail candidates", function () {
   var candidates = extractors.extractCandidates(
     "Film.2022.1080p.HMAX.WEB-DL.FLAC.24bit.48kHz.x265-Group",
