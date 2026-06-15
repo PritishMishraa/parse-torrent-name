@@ -8,12 +8,12 @@ var PRIORITY = {
   DESCRIPTIVE: 60,
 };
 
-var createContext = function (input, options) {
+var createContext = function (input, options, includeTokens) {
   var source = String(input || "");
 
   return {
     input: source,
-    tokens: tokenizer.tokenize(source),
+    tokens: includeTokens === false ? [] : tokenizer.tokenize(source),
     options: options || {},
   };
 };
@@ -218,7 +218,7 @@ var rules = [
       return /fhd/i.test(match[1]) ? "1080p" : "4k";
     },
   }),
-  valueMapRule("source.standard", "source", PRIORITY.TECHNICAL, /\b(?:WEB-?DL|WEB-?Rip|HDTV|PDTV|Blu-?Ray|BRRip|BDRip|HD-?Rip|DVD(?:Rip|scr)?|REMUX|HD-?CAM|CamRip|TS|Telesync)\b/i, {
+  valueMapRule("source.standard", "source", PRIORITY.TECHNICAL, /\b(?:(?:PPV\.)?HDTV|WEB-?DL|WEB-?Rip|PDTV|Blu-?Ray|BRRip|BDRip|HD-?Rip|DVD(?:Rip|scr)?|REMUX|HD-?CAM|CamRip|TS|Telesync)\b/i, {
     bluray: "bluray",
     brrip: "bluray",
     bdrip: "bluray",
@@ -230,6 +230,7 @@ var rules = [
     hdrip: "hdrip",
     hdtv: "hdtv",
     pdtv: "hdtv",
+    ppvhdtv: "hdtv",
     remux: "remux",
     telesync: "telesync",
     ts: "telesync",
@@ -380,6 +381,7 @@ var rules = [
     rawIndex: 1,
     valueIndex: 1,
   }),
+  regexpRule("garbage.legacy", "garbage", PRIORITY.DESCRIPTIVE, /\b(?:1400Mb|3rd Nov|Rip)\b/i),
   regexpRule("encoder.before-final-group", "encoder", PRIORITY.DESCRIPTIVE, /-([A-Za-z0-9][A-Za-z0-9[\]{}=+ ]*)-([A-Za-z0-9][A-Za-z0-9[\]{}=+ ]*)$/, {
     rawIndex: 1,
     valueIndex: 1,
@@ -390,15 +392,38 @@ var rules = [
   }),
 ];
 
-var extractCandidates = function (input, options) {
-  var ctx = createContext(input, options);
+var TITLE_RULE_IDS = {
+  "episode.sxxexx": true,
+  "garbage.legacy": true,
+  "region.standard": true,
+  "resolution.alias": true,
+  "resolution.standard": true,
+  "source.standard": true,
+  "website.prefix": true,
+  "year.bounded": true,
+};
+
+var titleRules = rules.filter(function (rule) {
+  return TITLE_RULE_IDS[rule.id];
+});
+
+var collectCandidates = function (input, options, ruleList, includeTokens) {
+  var ctx = createContext(input, options, includeTokens);
   var candidates = [];
 
-  rules.forEach(function (rule) {
+  ruleList.forEach(function (rule) {
     candidates = candidates.concat(rule.match(ctx));
   });
 
   return candidates.sort(compareCandidates);
+};
+
+var extractCandidates = function (input, options) {
+  return collectCandidates(input, options, rules);
+};
+
+var extractTitleCandidates = function (input, options) {
+  return collectCandidates(input, options, titleRules, false);
 };
 
 module.exports = {
@@ -406,5 +431,6 @@ module.exports = {
   createContext: createContext,
   createCandidate: createCandidate,
   extractCandidates: extractCandidates,
+  extractTitleCandidates: extractTitleCandidates,
   rules: rules,
 };

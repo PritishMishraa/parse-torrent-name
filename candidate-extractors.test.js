@@ -131,6 +131,31 @@ test("extracts language, container, region, and release flag candidates", functi
   assert.equal(findCandidate(candidates, "container", "MKV").value, "MKV");
 });
 
+test("extracts legacy title-boundary source and garbage candidates", function () {
+  var ppvCandidates = extractors.extractCandidates("UFC.179.PPV.HDTV.x264-Ebi");
+  var dateCandidates = extractors.extractCandidates(
+    "WWE Monday Night Raw 3rd Nov 2014 HDTV x264-Sir Paul",
+  );
+
+  assert.equal(findCandidate(ppvCandidates, "source", "PPV.HDTV").value, "hdtv");
+  assert.equal(findCandidate(dateCandidates, "garbage", "3rd Nov").value, "3rd Nov");
+});
+
+test("extracts a focused title-boundary candidate subset", function () {
+  var candidates = extractors.extractTitleCandidates(
+    "[Site] Movie.Name.S01E02.2024.1080p.WEB-DL.DDP5.1.x264-GRP",
+  );
+
+  assert.equal(findCandidate(candidates, "website", "[Site]").value, "Site");
+  assert.equal(findCandidate(candidates, "season", "S01E02").value, 1);
+  assert.equal(findCandidate(candidates, "episode", "S01E02").value, 2);
+  assert.equal(findCandidate(candidates, "year", "2024").value, 2024);
+  assert.equal(findCandidate(candidates, "resolution", "1080p").value, "1080p");
+  assert.equal(findCandidate(candidates, "source", "WEB-DL").value, "web-dl");
+  assert.equal(findCandidate(candidates, "audio", "DDP5.1"), undefined);
+  assert.equal(findCandidate(candidates, "codec", "x264"), undefined);
+});
+
 test("extracts audio detail candidates", function () {
   var candidates = extractors.extractCandidates(
     "Film.2022.1080p.HMAX.WEB-DL.FLAC.24bit.48kHz.x265-Group",

@@ -1,5 +1,9 @@
 "use strict";
 
+var candidateExtractors = require("./candidate-extractors");
+var inference = require("./inference");
+var resolver = require("./resolver");
+
 var rules = [
   { name: "season", pattern: /([Ss]?([0-9]{1,2}))[Eex]/, type: "integer" },
   {
@@ -753,7 +757,14 @@ module.exports.exec = function (name, options) {
   var excessRaw = name;
   var groupRaw = "";
   var map;
+  var resolvedCandidates;
+  var inferredTitle;
   options = options || {};
+
+  resolvedCandidates = resolver.resolveCandidates(
+    name,
+    candidateExtractors.extractTitleCandidates(name, options),
+  );
 
   var addPart = function (part) {
     if (part.appendTo) {
@@ -848,7 +859,8 @@ module.exports.exec = function (name, options) {
     addPart(part);
   });
 
-  addPart(getTitle(name, start, end));
+  inferredTitle = inference.inferTitle(name, resolvedCandidates.accepted);
+  addPart(inferredTitle || getTitle(name, start, end));
 
   (function addExcess() {
     var clean = excessRaw.replace(/(^[-\. ]+)|([-\. ]+$)/g, "");

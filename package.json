@@ -7,9 +7,13 @@
     ".": "./index.js"
   },
   "files": [
+    "candidate-extractors.js",
     "core.js",
+    "inference.js",
     "index.js",
-    "readme.md"
+    "readme.md",
+    "resolver.js",
+    "tokenizer.js"
   ],
   "repository": {
     "type": "git",

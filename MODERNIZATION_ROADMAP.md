@@ -39,6 +39,9 @@ Current progress:
 - Stage 4/5 internal infrastructure is in place with deterministic candidate
   conflict resolution, accepted/rejected overlap tracking, consumed span maps,
   unconsumed span maps, and focused tests for ambiguous overlap behavior.
+- Stage 6 has started: public title inference now uses accepted candidate spans
+  from a focused title-boundary extractor, with legacy-compatible cleanup,
+  fallback behavior, and focused inference tests.
 
 ## Source Context
 
