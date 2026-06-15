@@ -114,6 +114,16 @@ var cleanPhrase = function (raw) {
     .trim();
 };
 
+var cleanExcessTokens = function (raw) {
+  var clean = String(raw || "").replace(/(^[-\._ ]+)|([-\._ ]+$)/g, "");
+
+  clean = clean.replace(/[\(\)\/]/g, " ");
+
+  return clean.split(/\.\.+| +/).filter(function (token) {
+    return token && !/^[-\._]+$/.test(token);
+  });
+};
+
 var inferTitle = function (input, candidates) {
   var source = String(input || "");
   var accepted = candidates || [];
@@ -254,10 +264,44 @@ var inferGroupAndEncoder = function (input, candidates) {
   return inferred;
 };
 
+var inferExcess = function (input, consumedSpans) {
+  var source = String(input || "");
+  var spans = consumedSpans || [];
+  var raw = "";
+  var cursor = 0;
+
+  spans
+    .slice()
+    .sort(function (left, right) {
+      if (left.start !== right.start) {
+        return left.start - right.start;
+      }
+
+      return left.end - right.end;
+    })
+    .forEach(function (span) {
+      if (cursor < span.start) {
+        raw += source.slice(cursor, span.start);
+      }
+
+      if (span.end > cursor) {
+        cursor = span.end;
+      }
+    });
+
+  if (cursor < source.length) {
+    raw += source.slice(cursor);
+  }
+
+  return cleanExcessTokens(raw);
+};
+
 module.exports = {
+  inferExcess: inferExcess,
   inferGroupAndEncoder: inferGroupAndEncoder,
   inferEpisodeName: inferEpisodeName,
   inferTitle: inferTitle,
+  cleanExcessTokens: cleanExcessTokens,
   cleanPhrase: cleanPhrase,
   cleanTitle: cleanTitle,
 };

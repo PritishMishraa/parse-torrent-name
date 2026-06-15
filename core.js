@@ -754,9 +754,9 @@ module.exports.exec = function (name, options) {
   var parts = {};
   var start = 0;
   var end;
-  var excessRaw = name;
   var groupRaw = "";
   var map;
+  var consumedSpans = [];
   var resolvedCandidates;
   var resolvedEpisodeNameCandidates;
   var resolvedGroupCandidates;
@@ -785,6 +785,39 @@ module.exports.exec = function (name, options) {
     name,
     candidateExtractors.extractGroupCandidates(name, options),
   );
+
+  var addConsumedSpan = function (part) {
+    var rawOffset;
+    var spanStart;
+
+    if (!part.raw) {
+      return;
+    }
+
+    if (typeof part.start === "number") {
+      consumedSpans.push({
+        start: part.start,
+        end: part.start + part.raw.length,
+      });
+      return;
+    }
+
+    if (!part.match || typeof part.match.index !== "number") {
+      return;
+    }
+
+    rawOffset = part.match[0].indexOf(part.raw);
+
+    if (rawOffset === -1) {
+      return;
+    }
+
+    spanStart = part.match.index + rawOffset;
+    consumedSpans.push({
+      start: spanStart,
+      end: spanStart + part.raw.length,
+    });
+  };
 
   var addPart = function (part) {
     if (part.appendTo) {
@@ -817,7 +850,7 @@ module.exports.exec = function (name, options) {
     }
 
     if (part.name !== "excess") {
-      excessRaw = excessRaw.replace(part.raw, "");
+      addConsumedSpan(part);
     }
   };
 
@@ -907,12 +940,9 @@ module.exports.exec = function (name, options) {
   }
 
   (function addExcess() {
-    var clean = excessRaw.replace(/(^[-\. ]+)|([-\. ]+$)/g, "");
+    var clean = inference.inferExcess(name, consumedSpans);
     var groupPattern;
     var episodeNamePattern;
-
-    clean = clean.replace(/[\(\)\/]/g, " ");
-    clean = clean.split(/\.\.+| +/).filter(Boolean);
 
     if (clean.length !== 0) {
       groupPattern = escapeRegex(clean[clean.length - 1] + groupRaw) + "$";
@@ -924,7 +954,7 @@ module.exports.exec = function (name, options) {
         });
       }
 
-      if (map && clean[0]) {
+      if (!parts.episodeName && map && clean[0]) {
         episodeNamePattern =
           "{episode}" + escapeRegex(clean[0].replace(/_+$/, ""));
 
@@ -944,7 +974,7 @@ module.exports.exec = function (name, options) {
     if (clean.length !== 0) {
       addPart({
         name: "excess",
-        raw: excessRaw,
+        raw: "",
         clean: clean.length === 1 ? clean[0] : clean,
       });
     }

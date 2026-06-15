@@ -208,9 +208,10 @@ var rules = [
       },
     },
   ),
-  regexpRule("resolution.standard", "resolution", PRIORITY.TECHNICAL, /\b([0-9]{3,4}[pi])\b/i, {
+  regexpRule("resolution.standard", "resolution", PRIORITY.TECHNICAL, /(^|[^A-Za-z0-9])([0-9]{3,4}[pi])($|[^A-Za-z0-9])/i, {
+    rawIndex: 2,
     value: function (match) {
-      return match[1].toLowerCase();
+      return match[2].toLowerCase();
     },
   }),
   regexpRule("resolution.alias", "resolution", PRIORITY.TECHNICAL, /\b(4K|UHD|FHD)\b/i, {

@@ -33,6 +33,14 @@ var inferGroupAndEncoder = function (input) {
   return inference.inferGroupAndEncoder(input, resolved.accepted);
 };
 
+var span = function (raw, start) {
+  return {
+    raw: raw,
+    start: start,
+    end: start + raw.length,
+  };
+};
+
 test("infers title from leading unconsumed spans before release metadata", function () {
   assert.deepEqual(
     inferTitle("Movie.Name.2024.2160p.WEB-DL.DDP5.1.HEVC-GRP"),
@@ -154,5 +162,35 @@ test("does not infer spaced dashed episode names as release groups", function ()
   assert.deepEqual(
     inferGroupAndEncoder("Game of Thrones - 4x03 - Breaker of Chains"),
     {},
+  );
+});
+
+test("infers excess tokens from unconsumed spans", function () {
+  assert.deepEqual(
+    inference.inferExcess(
+      "Teenage Mutant Ninja Turtles (unknown_release_type / 2014)",
+      [
+        span("Teenage Mutant Ninja Turtles ", 0),
+        span("2014)", 53),
+      ],
+    ),
+    ["unknown_release_type"],
+  );
+});
+
+test("ignores consumed title, metadata, group, and separators in excess spans", function () {
+  assert.deepEqual(
+    inference.inferExcess(
+      "The Shaukeens 2014 Hindi (1CD) DvDScr x264 AAC...Hon3y",
+      [
+        span("The Shaukeens ", 0),
+        span("2014", 14),
+        span("DvDScr", 31),
+        span("x264", 38),
+        span("AAC", 43),
+        span("Hon3y", 49),
+      ],
+    ),
+    ["Hindi", "1CD"],
   );
 });

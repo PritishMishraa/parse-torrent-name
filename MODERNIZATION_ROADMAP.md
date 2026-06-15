@@ -49,6 +49,9 @@ Current progress:
 - Stage 8 has started: public final-hyphen group inference now uses accepted
   candidate spans, and conservative `-Encoder-GROUP` releases emit `encoder`
   while preserving fallback group behavior for legacy non-hyphen cases.
+- Stage 9 has started: public excess inference is now based on consumed spans
+  from accepted public parts instead of destructive string replacement, while
+  preserving legacy group/episode-name fallback cleanup.
 
 ## Source Context
 
