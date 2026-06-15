@@ -463,6 +463,17 @@ var torrents = [
     group: "Group",
     excess: undefined,
   },
+  {
+    name: "Movie.2024.1080p.BluRay.x264-SomeEncoder-GRP",
+    title: "Movie",
+    year: 2024,
+    resolution: "1080p",
+    source: "bluray",
+    codec: "x264",
+    encoder: "SomeEncoder",
+    group: "GRP",
+    excess: undefined,
+  },
 ];
 
 torrents.forEach(function (torrent) {

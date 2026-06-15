@@ -46,6 +46,9 @@ var EPISODE_NAME_BOUNDARY_FIELDS = {
   year: true,
 };
 
+var GROUP_METADATA_PATTERN =
+  /^(?:(?:PPV\.)?HDTV|WEB-?DL|WEB-?Rip|PDTV|Blu-?Ray|BRRip|BDRip|HD-?Rip|DVD(?:Rip|scr)?|REMUX|HD-?CAM|CamRip|TS|Telesync|xvid|x264|x[-. ]?265|h[-. ]?264|h[-. ]?265|hevc|av1)$/i;
+
 var trimLeadingSeparators = function (input, start) {
   var cursor = start;
 
@@ -203,7 +206,56 @@ var inferEpisodeName = function (input, candidates) {
   };
 };
 
+var getCandidate = function (candidates, field) {
+  return (candidates || []).find(function (candidate) {
+    return candidate.field === field;
+  });
+};
+
+var isStrongGroup = function (candidate) {
+  var value;
+
+  if (!candidate || candidate.source !== "group.final-hyphen") {
+    return false;
+  }
+
+  value = String(candidate.value || "");
+
+  return value && !/\s/.test(value) && !GROUP_METADATA_PATTERN.test(value);
+};
+
+var inferGroupAndEncoder = function (input, candidates) {
+  var group = getCandidate(candidates, "group");
+  var encoder = getCandidate(candidates, "encoder");
+  var inferred = {};
+
+  if (!isStrongGroup(group)) {
+    return inferred;
+  }
+
+  inferred.group = {
+    name: "group",
+    raw: group.raw,
+    clean: group.value,
+    start: group.start,
+    end: group.end,
+  };
+
+  if (encoder && encoder.end === group.start && String(encoder.value || "")) {
+    inferred.encoder = {
+      name: "encoder",
+      raw: encoder.raw,
+      clean: encoder.value,
+      start: encoder.start,
+      end: encoder.end,
+    };
+  }
+
+  return inferred;
+};
+
 module.exports = {
+  inferGroupAndEncoder: inferGroupAndEncoder,
   inferEpisodeName: inferEpisodeName,
   inferTitle: inferTitle,
   cleanPhrase: cleanPhrase,

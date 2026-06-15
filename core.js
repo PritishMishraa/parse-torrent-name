@@ -759,8 +759,10 @@ module.exports.exec = function (name, options) {
   var map;
   var resolvedCandidates;
   var resolvedEpisodeNameCandidates;
+  var resolvedGroupCandidates;
   var inferredTitle;
   var inferredEpisodeName;
+  var inferredGroupAndEncoder;
   options = options || {};
 
   resolvedCandidates = resolver.resolveCandidates(
@@ -778,6 +780,11 @@ module.exports.exec = function (name, options) {
       candidateExtractors.extractEpisodeNameCandidates(name, options),
     );
   }
+
+  resolvedGroupCandidates = resolver.resolveCandidates(
+    name,
+    candidateExtractors.extractGroupCandidates(name, options),
+  );
 
   var addPart = function (part) {
     if (part.appendTo) {
@@ -884,6 +891,19 @@ module.exports.exec = function (name, options) {
     if (inferredEpisodeName) {
       addPart(inferredEpisodeName);
     }
+  }
+
+  inferredGroupAndEncoder = inference.inferGroupAndEncoder(
+    name,
+    resolvedGroupCandidates.accepted,
+  );
+
+  if (inferredGroupAndEncoder.encoder) {
+    addPart(inferredGroupAndEncoder.encoder);
+  }
+
+  if (inferredGroupAndEncoder.group) {
+    addPart(inferredGroupAndEncoder.group);
   }
 
   (function addExcess() {

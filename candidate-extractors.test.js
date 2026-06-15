@@ -167,6 +167,16 @@ test("extracts a focused episode-name boundary candidate subset", function () {
   assert.equal(findCandidate(candidates, "group", "Kybik.v.Kybe"), undefined);
 });
 
+test("extracts a focused group and encoder candidate subset", function () {
+  var candidates = extractors.extractGroupCandidates(
+    "Movie.2024.1080p.BluRay.x264-SomeEncoder-GRP",
+  );
+
+  assert.equal(findCandidate(candidates, "encoder", "SomeEncoder").value, "SomeEncoder");
+  assert.equal(findCandidate(candidates, "group", "-GRP").value, "GRP");
+  assert.equal(findCandidate(candidates, "resolution", "1080p"), undefined);
+});
+
 test("extracts audio detail candidates", function () {
   var candidates = extractors.extractCandidates(
     "Film.2022.1080p.HMAX.WEB-DL.FLAC.24bit.48kHz.x265-Group",

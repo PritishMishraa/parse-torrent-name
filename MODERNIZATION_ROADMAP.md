@@ -46,6 +46,9 @@ Current progress:
   candidate spans from a focused episode-name boundary extractor, with
   release-metadata boundary handling and focused negative tests for language
   metadata.
+- Stage 8 has started: public final-hyphen group inference now uses accepted
+  candidate spans, and conservative `-Encoder-GROUP` releases emit `encoder`
+  while preserving fallback group behavior for legacy non-hyphen cases.
 
 ## Source Context
 

@@ -427,12 +427,21 @@ var EPISODE_NAME_RULE_IDS = {
   "year.bounded": true,
 };
 
+var GROUP_RULE_IDS = {
+  "encoder.before-final-group": true,
+  "group.final-hyphen": true,
+};
+
 var titleRules = rules.filter(function (rule) {
   return TITLE_RULE_IDS[rule.id];
 });
 
 var episodeNameRules = rules.filter(function (rule) {
   return EPISODE_NAME_RULE_IDS[rule.id];
+});
+
+var groupRules = rules.filter(function (rule) {
+  return GROUP_RULE_IDS[rule.id];
 });
 
 var collectCandidates = function (input, options, ruleList, includeTokens) {
@@ -458,12 +467,17 @@ var extractEpisodeNameCandidates = function (input, options) {
   return collectCandidates(input, options, episodeNameRules, false);
 };
 
+var extractGroupCandidates = function (input, options) {
+  return collectCandidates(input, options, groupRules, false);
+};
+
 module.exports = {
   PRIORITY: PRIORITY,
   createContext: createContext,
   createCandidate: createCandidate,
   extractEpisodeNameCandidates: extractEpisodeNameCandidates,
   extractCandidates: extractCandidates,
+  extractGroupCandidates: extractGroupCandidates,
   extractTitleCandidates: extractTitleCandidates,
   rules: rules,
 };

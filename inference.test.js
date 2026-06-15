@@ -24,6 +24,15 @@ var inferEpisodeName = function (input) {
   return inference.inferEpisodeName(input, resolved.accepted);
 };
 
+var inferGroupAndEncoder = function (input) {
+  var resolved = resolver.resolveCandidates(
+    input,
+    extractors.extractGroupCandidates(input),
+  );
+
+  return inference.inferGroupAndEncoder(input, resolved.accepted);
+};
+
 test("infers title from leading unconsumed spans before release metadata", function () {
   assert.deepEqual(
     inferTitle("Movie.Name.2024.2160p.WEB-DL.DDP5.1.HEVC-GRP"),
@@ -101,5 +110,49 @@ test("does not infer language metadata as an episode name", function () {
   assert.equal(
     inferEpisodeName("Community.s02e20.rus.eng.720p.Kybik.v.Kybe"),
     undefined,
+  );
+});
+
+test("infers final hyphen release groups from accepted spans", function () {
+  assert.deepEqual(
+    inferGroupAndEncoder("Movie.2024.1080p.WEB-DL.x264-GRP"),
+    {
+      group: {
+        name: "group",
+        raw: "-GRP",
+        clean: "GRP",
+        start: 28,
+        end: 32,
+      },
+    },
+  );
+});
+
+test("infers conservative encoder before final release group", function () {
+  assert.deepEqual(
+    inferGroupAndEncoder("Movie.2024.1080p.BluRay.x264-SomeEncoder-GRP"),
+    {
+      group: {
+        name: "group",
+        raw: "-GRP",
+        clean: "GRP",
+        start: 40,
+        end: 44,
+      },
+      encoder: {
+        name: "encoder",
+        raw: "SomeEncoder",
+        clean: "SomeEncoder",
+        start: 29,
+        end: 40,
+      },
+    },
+  );
+});
+
+test("does not infer spaced dashed episode names as release groups", function () {
+  assert.deepEqual(
+    inferGroupAndEncoder("Game of Thrones - 4x03 - Breaker of Chains"),
+    {},
   );
 });
