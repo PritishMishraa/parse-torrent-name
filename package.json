@@ -1,0 +1,33 @@
+{
+  "name": "parse-torrent-name",
+  "version": "0.5.4",
+  "description": "Parses torrent name of a movie or TV show.",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": [
+    "core.js",
+    "index.js",
+    "readme.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PritishMishraa/parse-torrent-name.git"
+  },
+  "homepage": "https://github.com/PritishMishraa/parse-torrent-name",
+  "bugs": {
+    "url": "https://github.com/PritishMishraa/parse-torrent-name/issues"
+  },
+  "keywords": [
+    "torrent",
+    "parse torrent name"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "benchmark": "node benchmark/parse.js",
+    "test": "node --test test.js"
+  }
+}
