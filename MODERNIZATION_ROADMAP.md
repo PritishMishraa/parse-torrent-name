@@ -36,6 +36,9 @@ Current progress:
   structural, technical, descriptive, language, container, group, encoder, and
   prefix fields while preserving the legacy parser as the public projection
   path.
+- Stage 4/5 internal infrastructure is in place with deterministic candidate
+  conflict resolution, accepted/rejected overlap tracking, consumed span maps,
+  unconsumed span maps, and focused tests for ambiguous overlap behavior.
 
 ## Source Context
 
