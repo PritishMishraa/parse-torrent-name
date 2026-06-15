@@ -8,6 +8,29 @@ It is intentionally detailed. A contributor should be able to read this file and
 understand what needs to be built, why it matters, and how to approach the work
 without needing the original Codex threads.
 
+## Current Execution Plan
+
+Work should proceed in thin compatibility-preserving slices:
+
+1. Preserve the current public behavior with the existing test and benchmark
+   suite.
+2. Add internal tokenizer and span utilities with independent tests, without
+   changing public parser output.
+3. Add candidate extractor scaffolding for a small set of high-confidence
+   fields while keeping the old parser as the projection path.
+4. Add conflict resolution tests for known ambiguous overlaps.
+5. Replace title, episode name, group, and excess inference one area at a time
+   using accepted candidate spans.
+6. Add `includeDebug` only after candidates and conflict resolution are stable.
+7. Add TypeScript declarations or migrate internals once the runtime contracts
+   have stopped moving.
+
+Current progress:
+
+- Stage 0 baseline is in place: public tests, normalized-output tests, and a
+  benchmark command exist.
+- Stage 1 has started with internal tokenizer/span utilities and focused tests.
+
 ## Source Context
 
 Notes were consolidated from these Codex threads:

@@ -28,6 +28,6 @@
   },
   "scripts": {
     "benchmark": "node benchmark/parse.js",
-    "test": "node --test test.js"
+    "test": "node --test"
   }
 }
